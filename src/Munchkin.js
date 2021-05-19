@@ -8,23 +8,41 @@ class Munchkin {
     this.treasureDeck = treasureDeck;
   }
 
+  set eventReceiver(receiverFn) {
+    this.receiverFn = receiverFn;
+  }
+
+  raiseEvent(name, args) {
+    this.receiverFn && this.receiverFn(name, args);
+  }
+
   ouvrirPorte(player) {
     if (this.donjonDeck.isEmpty) {
+      this.raiseEvent("La pile de cartes est vide");
       return {
         type: "empty"
       };
     }
 
     const card = this.donjonDeck.nextCard();
+    this.raiseEvent("Ouvrir la porte", card);
+    console.log(
+      "🚀 ~ file: Munchkin.js ~ line 19 ~ Munchkin ~ ouvrirPorte ~ card",
+      card
+    );
 
     if (card.type === TYPE_CARTE.MONSTRE) {
       const win = player.fight(card);
+      console.log(
+        "🚀 ~ file: Munchkin.js ~ line 26 ~ Munchkin ~ ouvrirPorte ~ win",
+        win
+      );
 
       if (win) {
         player.level += card.levelGain;
 
         const treasure = this.treasureDeck.nextCard();
-        player.cards.push(treasure);
+        treasure && player.cards.push(treasure);
 
         let gameStep;
         if (player.cardsCount > 5) {
@@ -40,14 +58,9 @@ class Munchkin {
           gameStep
         };
       } else {
-        player.level--;
-        if (player.level === 0) {
-          player.dead = true;
-
-          return {
-            type: "dead",
-            card
-          };
+        if (card.incident) {
+        } else if (card.incidentFn) {
+          card.incidentFn(player);
         }
 
         return {
@@ -62,6 +75,13 @@ class Munchkin {
       return {
         gameStep: GAME_STEPS.TROUBLE
       };
+    } else if (card.type === TYPE_CARTE.ITEM) {
+      if (card.gainNiveau) {
+        player.level++;
+      } else if (card.usageUnique) {
+      } else {
+        player.equip(card);
+      }
     } else {
       if (player.cardsCount > 5) {
         return {
@@ -82,6 +102,18 @@ class Munchkin {
 
   pillerPiece(player) {
     // nextCard
+  }
+
+  sellItems(player, cards) {
+    const total = cards.reduce((acc, val) => {
+      return acc + val.valeur;
+    }, 0);
+    if (total >= 1000) {
+      this.raiseEvent(
+        `Le joueur ${player.name} a gagné un niveau en vendant pour ${total} pièves d'or`
+      );
+      player.level++;
+    }
   }
 
   charite(player) {

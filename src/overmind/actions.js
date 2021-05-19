@@ -9,3 +9,10 @@ export const setPlayers = ({ state }, players) => {
 export const setGameStep = ({ state }, value) => {
   state.gameStep = value;
 };
+
+export const setSelectedCards = ({ state }, { playerName, cardNames }) => {
+  const player = state.players.find((p) => p.name === playerName);
+  if (player) {
+    player.selectedCards = cardNames;
+  }
+};

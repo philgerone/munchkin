@@ -12,7 +12,10 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormGroup from "@material-ui/core/FormGroup";
 
+import EuroIcon from "@material-ui/icons/Euro";
+
 import React from "react";
+import { useActions } from "../overmind";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,17 +36,31 @@ const useStyles = makeStyles((theme) => ({
 
 function Player({ player }) {
   const classes = useStyles();
+  const actions = useActions();
 
   const [state, setState] = React.useState({});
 
   const handleChange = (event) => {
-    setState({ ...state, [event.target.name]: event.target.checked });
+    const cards = { ...state, [event.target.name]: event.target.checked };
+    setState(cards);
+    const cardNames = Object.entries(cards)
+      .filter(([key, value]) => value === true)
+      .map(([key, value]) => {
+        return key;
+      });
+    console.log(
+      "🚀 ~ file: Player.js ~ line 46 ~ handleChange ~ cards",
+      cardNames
+    );
+    actions.setSelectedCards({ playerName: player.name, cardNames });
   };
 
   if (!player) {
     return null;
   }
 
+  const items = player.items;
+  const main = player.main;
   return (
     <Paper className={classes.paper}>
       <Typography variant="h4" gutterBottom>
@@ -55,13 +72,13 @@ function Player({ player }) {
 
       <FormControl component="fieldset" className={classes.formControl}>
         <FormLabel component="legend">
-          {`Cartes ${player.cards.length}`}{" "}
+          {`Equipé ${player.items.length}`}{" "}
         </FormLabel>
         <FormGroup>
-          {player.cards.map((card) => {
+          {player.items.map((card) => {
             return (
               <FormControlLabel
-                key={card.index}
+                key={card.name}
                 value={card.name}
                 control={
                   <Checkbox
@@ -71,9 +88,52 @@ function Player({ player }) {
                   />
                 }
                 label={
-                  <Typography className={classes.text}>
-                    {`${card.name} Bonus: ${card.bonus} Valeur: ${card.value}`}
-                  </Typography>
+                  <Grid container>
+                    <Grid item>{card.name}</Grid>
+                    <Grid item>
+                      <EuroIcon item />
+                    </Grid>
+                    <Grid item>{card.valeur}</Grid>
+                    {/* <EuroIcon item />
+                    <Typography className={classes.text}>
+                      {`${card.valeur}`}
+                    </Typography> */}
+                  </Grid>
+                }
+              />
+            );
+          })}
+        </FormGroup>
+      </FormControl>
+      <FormControl component="fieldset" className={classes.formControl}>
+        <FormLabel component="legend">
+          {`Main ${player.main.length}`}{" "}
+        </FormLabel>
+        <FormGroup>
+          {player.main.map((card) => {
+            return (
+              <FormControlLabel
+                key={card.name}
+                value={card.name}
+                control={
+                  <Checkbox
+                    checked={state[card.name]}
+                    onChange={handleChange}
+                    name={card.name}
+                  />
+                }
+                label={
+                  <Grid container>
+                    <Grid item>{card.name}</Grid>
+                    <Grid item>
+                      <EuroIcon item />
+                    </Grid>
+                    <Grid item>{card.valeur}</Grid>
+                    {/* <EuroIcon item />
+                    <Typography className={classes.text}>
+                      {`${card.valeur}`}
+                    </Typography> */}
+                  </Grid>
                 }
               />
             );

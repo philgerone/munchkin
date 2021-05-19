@@ -4,7 +4,7 @@ import { createItems, createMonsters } from "../card";
 import cards from "../cards";
 import Deck from "../deck";
 import Player from "../player";
-import { GAME_STEPS } from "../types";
+import { createCartesTresor, GAME_STEPS } from "../types";
 
 export const monsters = createMonsters(10);
 export const treasures = createItems(30);
@@ -17,10 +17,11 @@ export const createPlayer = (name, isDealer) => {
   };
 };
 
-const deckT = new Deck(treasures);
+const cartesTresor = createCartesTresor();
+const deckT = new Deck(cartesTresor);
 
 const player = new Player("Pge");
-player.addCards(deckT.nextCards(4));
+player.addCards(deckT.nextCards(1));
 const player2 = new Player("Noam");
 player2.addCards(deckT.nextCards(4));
 const player3 = new Player("Daoud");
@@ -42,8 +43,6 @@ export const state = {
   currentPlayer: null,
   gameStep: GAME_STEPS.OPEN_DOOR,
   players,
-  dungeonDeck: monsters,
-  treasureDeck: treasures,
   cards,
   meName: "",
   me: derived((state) => {

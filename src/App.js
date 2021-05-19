@@ -42,9 +42,19 @@ import DeckClass from "./deck";
 
 import { monsters, treasures, players } from "./overmind/state";
 import Players from "./components/Players";
-import { GAME_STEPS } from "./types";
+import {
+  DONJONS,
+  TRESORS,
+  createCartesTresor,
+  MONSTERS,
+  ITEMS,
+  CURSES,
+  GAME_STEPS
+} from "./types";
 
-const ENDPOINT = "http://192.168.0.82:8080";
+import SecurityIcon from "@material-ui/icons/Security";
+
+const ENDPOINT = "http://192.168.0.82:8081";
 
 const ITEM_HEIGHT = 48;
 
@@ -75,15 +85,13 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-// const c1 = new Item("armure", 3, 100);
-// const player = new PlayerClass("Pge");
-// player.addCard(c1);
-const deck = new DeckClass(monsters);
-const deckT = new DeckClass(treasures);
-const munchkin = new Munchkin(players, deck, deckT);
+const cartesTresor = createCartesTresor();
+const deckDonjon = new DeckClass(DONJONS);
+const deckTresor = new DeckClass(cartesTresor);
+const munchkin = new Munchkin(players, deckDonjon, deckTresor);
 
 function App() {
-  const [deck, setDeck] = React.useState([]);
+  const [onlinePlayers, setOnlinePlayers] = React.useState([]);
   const [card, setCard] = React.useState();
   const [win, setWin] = React.useState();
 
@@ -101,6 +109,12 @@ function App() {
   const amIPlaying = true; // me?.isPlaying;
 
   useEffect(() => {
+    munchkin.eventReceiver = (name, args) => {
+      console.log("===> munchkin eventReceiver ~ name, args", name, args);
+    };
+  }, []);
+
+  useEffect(() => {
     const _name = localStorage.getItem("name");
     setName(_name ?? "");
 
@@ -108,43 +122,50 @@ function App() {
     player && actions.setMe(player);
   }, []);
 
-  // useEffect(() => {
-  //   const socket = socketIOClient(ENDPOINT);
-  //   socketRef.current = socket;
-  //   socket.on("hello", (data) => {
-  //     console.log("🚀 ~ file: App.js ~ line 74 ~ socket.on ~ HELLO", data);
-  //   });
-  //   socket.on("emtyDeck", () => {
-  //     console.log("emty deck");
-  //   });
-  //   socket.on("deck", (sdeck) => {
-  //     console.log("🚀 ~ file: App.js ~ line 86 ~ socket.on ~ sdeck", sdeck);
-  //     setDeck(sdeck);
-  //   });
-  //   socket.on("card", (scard) => {
-  //     setCard(scard);
-  //   });
-  //   socket.on("newGame", (players, sdeck) => {
-  //     console.log("🚀 ~ file: App.js ~ line 83 ~ socket.on ~ newGame", players);
-  //     actions.setPlayers(players);
-  //     setCard(null);
-  //     setDeck(sdeck);
-  //   });
-  //   socket.on("players", (players) => {
-  //     console.log("🚀 ~ file: App.js ~ line 83 ~ socket.on ~ players", players);
-  //     actions.setPlayers(players);
-  //   });
-  //   socket.on("playerAlreadyExist", (name) => {
-  //     alert(`Le joueur ${name} existe déjà`);
-  //   });
+  useEffect(() => {
+    const socket = socketIOClient(ENDPOINT);
+    socketRef.current = socket;
+    socket.on("message", (name, args) => {
+      console.log(
+        "🚀 ~ file: App.js ~ line 115 ~ socket.on ~ name, args",
+        name,
+        args
+      );
+    });
+    socket.on("hello", (data) => {
+      console.log("🚀 ~ file: App.js ~ line 74 ~ socket.on ~ HELLO", data);
+    });
+    // socket.on("emtyDeck", () => {
+    //   console.log("emty deck");
+    // });
+    // socket.on("deck", (sdeck) => {
+    //   console.log("🚀 ~ file: App.js ~ line 86 ~ socket.on ~ sdeck", sdeck);
+    //   setDeck(sdeck);
+    // });
+    // socket.on("card", (scard) => {
+    //   setCard(scard);
+    // });
+    socket.on("newGame", (players, sdeck) => {
+      console.log("🚀 ~ file: App.js ~ line 83 ~ socket.on ~ newGame", players);
+      // actions.setPlayers(players);
+      // setCard(null);
+      // setDeck(sdeck);
+    });
+    socket.on("players", (players) => {
+      console.log("🚀 ~ file: App.js ~ line 83 ~ socket.on ~ players", players);
+      setOnlinePlayers(players);
+    });
+    socket.on("playerAlreadyExist", (name) => {
+      alert(`Le joueur ${name} existe déjà`);
+    });
 
-  //   // CLEAN UP THE EFFECT
-  //   return () => {
-  //     socket.disconnect();
-  //     socketRef.current = null;
-  //   };
-  //   //
-  // }, []);
+    // CLEAN UP THE EFFECT
+    return () => {
+      socket.disconnect();
+      socketRef.current = null;
+    };
+    //
+  }, []);
 
   const handleNewGame = () => {
     setAnchorEl(null);
@@ -179,7 +200,7 @@ function App() {
 
   const handleEnterGame = () => {
     localStorage.setItem("name", name);
-    // socketRef.current.emit("newPlayer", name);
+    socketRef.current.emit("newPlayer", name);
     setModalOpen(false);
   };
 
@@ -204,17 +225,23 @@ function App() {
   };
 
   const handleTrouble = () => {
-    munchkin.chercherBagarre();
+    munchkin.chercherBagarre(players[0]);
     // socketRef.current.emit("newCard", me.name, "ferme");
   };
 
   const handleLoot = () => {
-    munchkin.pillerPiece();
+    munchkin.pillerPiece(players[0]);
     // socketRef.current.emit("servi");
   };
 
   const handleCharity = () => {
-    munchkin.charite();
+    munchkin.charite(players[0]);
+    // socketRef.current.emit("servi");
+  };
+
+  const handleSellItems = () => {
+    const cards = [];
+    munchkin.sellItems(players[0], cards);
     // socketRef.current.emit("servi");
   };
 
@@ -224,6 +251,7 @@ function App() {
 
   return (
     <>
+      {/* <SecurityIcon /> */}
       <AppBar position="static">
         <Toolbar>
           <IconButton
@@ -252,6 +280,11 @@ function App() {
         <MenuItem onClick={handlePlay}>Jouer</MenuItem>
       </Menu>
 
+      <Grid>
+        <Typography variant="h6">Joueurs en ligne</Typography>
+        <Typography>{`${onlinePlayers.map((p) => p.name).join()}`}</Typography>
+      </Grid>
+      <Divider />
       <Grid
         container
         direction="column"
@@ -275,8 +308,8 @@ function App() {
           justify="space-evenly"
           alignItems="center"
           style={{ border: "1px solid lightgray" }}>
-          <Grid item>{`Donjon : ${state.dungeonDeck.length}`}</Grid>
-          <Grid item>{`Trésors : ${state.treasureDeck.length}`}</Grid>
+          <Grid item>{`Donjon : ${munchkin.donjonDeck.length}`}</Grid>
+          <Grid item>{`Trésors : ${munchkin.treasureDeck.length}`}</Grid>
         </Grid>
         <Divider />
         <Grid
@@ -324,7 +357,7 @@ function App() {
           <Button
             variant="contained"
             color="primary"
-            onClick={handleLoot}
+            onClick={handleSellItems}
             disabled={!amIPlaying}>
             Vendre
           </Button>

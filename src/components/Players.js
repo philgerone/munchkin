@@ -4,16 +4,16 @@ import Player from "./Player";
 
 function Players() {
   const state = useState();
-  console.log("🚀 ~ file: Players.js ~ line 7 ~ Players ~ state", state);
+  // console.log("🚀 ~ file: Players.js ~ line 7 ~ Players ~ state", state);
 
   return (
     <Grid container justify="space-evenly" alignItems="center">
       {state.players
         .filter((player) => player.name !== state.me?.name)
-        .map((player) => {
+        .map((player, idx) => {
           return (
-            <Grid item>
-              <Player key={player.name} player={player} />
+            <Grid item key={player.name}>
+              <Player player={player} />
             </Grid>
           );
         })}

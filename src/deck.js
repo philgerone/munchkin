@@ -5,8 +5,12 @@ class Deck {
     this.cards = cards;
   }
 
+  get length() {
+    return this.cards.length;
+  }
+
   get isEmpty() {
-    return this.cards.lengthh === 0;
+    return this.cards.length === 0;
   }
 
   nextCards(nb) {
