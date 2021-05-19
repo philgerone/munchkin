@@ -74,7 +74,12 @@ class Munchkin {
         this.raiseEvent(`Le joueur ${player.name} a vaincu ${card.name}`);
 
         const treasure = this.treasureDeck.nextCard();
-        treasure && player.equip(treasure);
+        if (treasure) {
+          this.raiseEvent(
+            `Le joueur ${player.name} a reçu ${card.name} comme trésor`
+          );
+          player.equip(treasure);
+        }
 
         this.nextStep(player);
 
@@ -152,7 +157,23 @@ class Munchkin {
   }
 
   pillerPiece(player) {
-    // nextCard
+    if (this.donjonDeck.isEmpty) {
+      this.raiseEvent("La pile de cartes est vide");
+      return {
+        type: "empty"
+      };
+    }
+
+    const card = this.donjonDeck.nextCard();
+    if (card) {
+      this.raiseEvent("Piller la pièce : " + card.name);
+
+      card && player.equip(card);
+    }
+
+    return {
+      gameStep: GAME_STEPS.CHARITY
+    };
   }
 
   sellItems(player, cards) {
@@ -174,6 +195,10 @@ class Munchkin {
         // give card
       });
     }
+
+    return {
+      gameStep: GAME_STEPS.END
+    };
   }
 }
 

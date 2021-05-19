@@ -3,7 +3,12 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 
+import DeleteIcon from "@material-ui/icons/Delete";
+
 import CardsList from "./CardsList";
+import { RACES } from "../types";
+import { useActions, useState } from "../overmind";
+import { DropTarget } from "./DropTarget";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,8 +27,39 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function Player({ player }) {
+function Player({ playerName }) {
   const classes = useStyles();
+  const state = useState();
+  const actions = useActions();
+
+  const player = state.players.find((player) => player.name === playerName);
+
+  const handleItemDropped = (to, item) => {
+    actions.moveCard({
+      fromPlayerName: item.playerName,
+      toPlayerName: player.name,
+      cardName: item.cardName,
+      cardFrom: item.from,
+      toCard: to
+    });
+  };
+
+  const hadleItemDroppedOnRace = (item) => {
+    const card = player.cards.find((c) => c.name === item.cardName);
+
+    actions.setPlayerRace({ playerName: player.name, race: item.cardName });
+  };
+
+  const hadleItemDroppedOnClasse = (item) => {
+    actions.setPlayerClasse({ playerName: player.name, race: item.cardName });
+  };
+
+  const handleDeleteRace = (type) => {
+    actions.setPlayerRace({ playerName: player.name, race: RACES.HUMAIN });
+  };
+  const handleDeleteClasse = (type) => {
+    actions.setPlayerClasse({ playerName: player.name, classe: null });
+  };
 
   if (!player) {
     return null;
@@ -38,8 +74,19 @@ function Player({ player }) {
         <Grid>{`Niveau : ${player?.level}`}</Grid>
       </Grid>
       <Grid container justify="space-between">
-        <Grid>{`Race : ${player?.race}`}</Grid>
-        <Grid>{`Classe : ${player?.classe ?? "Aucune"}`}</Grid>
+        <DropTarget onItemDropped={hadleItemDroppedOnRace}>
+          <Grid>
+            {`Race : ${player?.race}`}
+            <DeleteIcon onClick={handleDeleteRace} />
+          </Grid>
+        </DropTarget>
+
+        <DropTarget onItemDropped={hadleItemDroppedOnClasse}>
+          <Grid>
+            {`Classe : ${player?.classe ?? "Aucune"}`}
+            <DeleteIcon onClick={handleDeleteClasse} />
+          </Grid>
+        </DropTarget>
       </Grid>
       <Grid container justify="space-between">
         <Grid>{`Bonuses : ${player.bonuses}`}</Grid>
@@ -47,10 +94,22 @@ function Player({ player }) {
       </Grid>
       <Grid container justify="space-between">
         <Grid item style={{ border: "1px solid lightgray", width: 200 }}>
-          <CardsList player={player} type="items" />
+          <CardsList
+            player={player}
+            type="cards"
+            onItemDropped={(item) => {
+              handleItemDropped("cards", item);
+            }}
+          />
         </Grid>
         <Grid item style={{ border: "1px solid lightgray", width: 200 }}>
-          <CardsList player={player} type="main" />
+          <CardsList
+            player={player}
+            type="main"
+            onItemDropped={(item) => {
+              handleItemDropped("main", item);
+            }}
+          />
         </Grid>
       </Grid>
       {/* <ul>

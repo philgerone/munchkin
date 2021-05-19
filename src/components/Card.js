@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function Card({ card }) {
+function Card({ card, onItemDropped }) {
   const classes = useStyles();
   const [age, setAge] = React.useState("");
   const [open, setOpen] = React.useState(false);
@@ -53,7 +53,7 @@ function Card({ card }) {
   };
 
   const itemDropped = (item) => {
-    console.log("🚀 ~ file: Player.js ~ line 85 ~ itemDropped ~ item", item);
+    onItemDropped(item);
   };
 
   return (

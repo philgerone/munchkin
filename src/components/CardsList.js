@@ -1,4 +1,4 @@
-import { makeStyles } from "@material-ui/core";
+import { Card, makeStyles } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
@@ -19,6 +19,7 @@ import React, { useRef } from "react";
 import { useActions } from "../overmind";
 import { Drag } from "./Drag";
 import { DropTarget } from "./DropTarget";
+import { TYPE_CARTE } from "../types";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -43,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function CardsList({ player, type }) {
+function CardsList({ player, type, onItemDropped }) {
   const classes = useStyles();
   const actions = useActions();
 
@@ -57,26 +58,44 @@ function CardsList({ player, type }) {
       .map(([key, value]) => {
         return key;
       });
-    console.log(
-      "🚀 ~ file: Player.js ~ line 46 ~ handleChange ~ cards",
-      cardNames
-    );
     actions.setSelectedCards({ playerName: player.name, cardNames });
   };
 
   const itemDropped = (item) => {
-    console.log("🚀 ~ file: Player.js ~ line 85 ~ itemDropped ~ item", item);
+    onItemDropped(item);
   };
 
-  const items = type === "items" ? player.items : player.main;
-  const label = type === "items" ? "Equipé" : "Main";
+  const items = type === "cards" ? player.items : player.main;
+  const label = type === "cards" ? "Equipé" : "Main";
+
+  function getCardText(card) {
+    let cardText = "";
+    switch (card.type) {
+      case TYPE_CARTE.MALEDICTION:
+        cardText = `${card.name} Perte de ${card.perteItem} `;
+        break;
+      case TYPE_CARTE.ITEM:
+        cardText = `${card.name} +${card.bonus} ${card.valeur}€ `;
+        break;
+      default:
+        cardText = `${card.name}`;
+    }
+
+    return cardText;
+  }
+
   return (
     <DropTarget onItemDropped={itemDropped} className={classes.drop}>
       <FormControl component="fieldset" className={classes.formControl}>
         <FormLabel component="legend">{`${label} ${items.length}`} </FormLabel>
         <FormGroup>
           {items.map((card, index) => {
-            const dataItem = { playerName: player.name, cardName: card.name };
+            const dataItem = {
+              playerName: player.name,
+              cardName: card.name,
+              from: type,
+              value: card.valeur
+            };
             return (
               <Drag dataItem={dataItem}>
                 <FormControlLabel
@@ -92,8 +111,7 @@ function CardsList({ player, type }) {
                   }
                   label={
                     <Grid container className={classes.text}>
-                      <Grid
-                        item>{`${card.name} +${card.bonus} ${card.valeur}€ `}</Grid>
+                      <Grid item>{getCardText(card)}</Grid>
                     </Grid>
                   }
                 />

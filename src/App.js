@@ -30,6 +30,9 @@ import MenuItem from "@material-ui/core/MenuItem";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import Fade from "@material-ui/core/Fade";
 
+import DeleteIcon from "@material-ui/icons/Delete";
+import EuroIcon from "@material-ui/icons/Euro";
+
 import Decks from "./components/Decks";
 import Player from "./components/Player";
 
@@ -53,6 +56,7 @@ import {
 } from "./types";
 
 import SecurityIcon from "@material-ui/icons/Security";
+import { DropTarget } from "./components/DropTarget";
 
 const ENDPOINT = "http://192.168.0.82:8081";
 
@@ -110,6 +114,10 @@ function App() {
 
   const me = state.me;
   const amIPlaying = true; // me?.isPlaying;
+
+  useEffect(() => {
+    actions.setPlayers(players);
+  }, []);
 
   useEffect(() => {
     munchkin.eventReceiver = (name, args) => {
@@ -232,7 +240,7 @@ function App() {
   };
 
   const handleLoot = () => {
-    const result = munchkin.ouvrirPorte(players[0]);
+    const result = munchkin.pillerPiece(players[0]);
     console.log("LOOT  ~ result", result.type, result.win);
     if (result.type === "empty") {
       return;
@@ -243,7 +251,13 @@ function App() {
   };
 
   const handleCharity = () => {
-    munchkin.charite(players[0]);
+    const result = munchkin.charite(players[0]);
+
+    actions.setGameStep(result.gameStep);
+  };
+
+  const handleFinTour = () => {
+    actions.setGameStep(GAME_STEPS.OPEN_DOOR);
   };
 
   const handleSellItems = () => {
@@ -253,6 +267,21 @@ function App() {
 
   const handleChange = (event) => {
     setName(event.target.value);
+  };
+
+  const handleItemDropped = (item) => {
+    console.log(
+      "🚀 ~ file: App.js ~ line 259 ~ handleItemDropped ~ item",
+      item
+    );
+  };
+
+  const handleSellAmoutDropped = (item) => {
+    console.log(
+      "🚀 ~ file: App.js ~ line 280 ~ handleSellAmoutDropped ~ item",
+      item
+    );
+    actions.addSellAmount(item.value);
   };
 
   return (
@@ -314,8 +343,25 @@ function App() {
           justify="space-evenly"
           alignItems="center"
           style={{ border: "1px solid lightgray" }}>
+          <Grid item>
+            <DeleteIcon />
+          </Grid>
+
           <Grid item>{`Donjon : ${munchkin.donjonDeck.length}`}</Grid>
           <Grid item>{`Trésors : ${munchkin.treasureDeck.length}`}</Grid>
+
+          <Grid item>
+            <DropTarget onItemDropped={handleSellAmoutDropped}>
+              <EuroIcon />
+              {state.sellAmount}
+              <button
+                onClick={() => {
+                  actions.setSellAmount(0);
+                }}>
+                Annuler
+              </button>
+            </DropTarget>
+          </Grid>
         </Grid>
         <Divider />
         <Grid
@@ -324,12 +370,22 @@ function App() {
           justify="space-evenly"
           alignItems="flex-start"
           style={{ border: "1px solid lightgray" }}>
-          <Grid item>{<Player player={state.me} />}</Grid>
+          <Grid item>{<Player playerName={state.meName} />}</Grid>
           <Grid item>{win && `Monstre vaincu : ${win ? "OUI" : "NON"}`}</Grid>
-          <Grid item>{card && <Card card={card} />}</Grid>
+          <Grid item>
+            {card && (
+              <Card
+                card={card}
+                onItemDropped={() => {
+                  handleItemDropped();
+                }}
+              />
+            )}
+          </Grid>
         </Grid>
 
         <Grid item>
+          {`Etape : ${state.gameStep}`}
           <Button
             variant="contained"
             color="primary"
@@ -373,7 +429,7 @@ function App() {
           </Button>
         </Grid>
         <Grid item>
-          <Button variant="contained" color="primary" onClick={handleNewDuel}>
+          <Button variant="contained" color="primary" onClick={handleFinTour}>
             Fin du tour
           </Button>
         </Grid>

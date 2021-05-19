@@ -61,7 +61,11 @@ class Player {
   }
 
   equip(card) {
-    this.equipements.equip(card);
+    if (card.type === TYPE_CARTE.ITEM) {
+      this.equipements.equip(card);
+    } else {
+      this.main.push(card);
+    }
   }
 
   addCards(cards) {

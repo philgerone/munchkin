@@ -13,7 +13,7 @@ function Players() {
         .map((player, idx) => {
           return (
             <Grid item key={player.name}>
-              <Player player={player} />
+              <Player playerName={player.name} />
             </Grid>
           );
         })}
