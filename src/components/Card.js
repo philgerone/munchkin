@@ -13,6 +13,8 @@ import Paper from "@material-ui/core/Paper";
 import { useState } from "../overmind";
 import { TYPE_CARTE } from "../types";
 
+import { DropTarget } from "./DropTarget";
+
 const useStyles = makeStyles((theme) => ({
   button: {
     display: "block",
@@ -25,7 +27,10 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     margin: 5,
     padding: 15,
-    width: 200
+    width: 400
+  },
+  drop: {
+    height: "100%"
   }
 }));
 
@@ -47,16 +52,26 @@ function Card({ card }) {
     setOpen(true);
   };
 
-  return (
-    <Paper className={classes.paper}>
-      <Typography variant="h4" gutterBottom>
-        {card.name}
-      </Typography>
-      <Grid>{`Niveau : ${card.level}`}</Grid>
-      <Grid>{`Gain : ${card.levelGain}`}</Grid>
-      <Grid>{`Trésors : ${card.treasureGain}`}</Grid>
+  const itemDropped = (item) => {
+    console.log("🚀 ~ file: Player.js ~ line 85 ~ itemDropped ~ item", item);
+  };
 
-      {card.type === TYPE_CARTE.MALEDICTION && (
+  return (
+    <DropTarget onItemDropped={itemDropped} className={classes.drop}>
+      <Paper className={classes.paper}>
+        <Grid container justify="space-between">
+          <Typography variant="h4" gutterBottom>
+            {card.name}
+          </Typography>
+          <Grid>{`Niveau : ${card.level}`}</Grid>
+        </Grid>
+
+        <Grid container justify="space-between">
+          <Grid>{`Gain : ${card.levelGain}`}</Grid>
+          <Grid>{`Trésors : ${card.treasureGain}`}</Grid>
+        </Grid>
+
+        {/* {card.type === TYPE_CARTE.MALEDICTION && (
         <>
           <FormControl className={classes.formControl}>
             <InputLabel id="demo-controlled-open-select-label">
@@ -81,8 +96,9 @@ function Card({ card }) {
           </FormControl>
           <Button>Envoyer</Button>
         </>
-      )}
-    </Paper>
+      )} */}
+      </Paper>
+    </DropTarget>
   );
 }
 
