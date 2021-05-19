@@ -95,6 +95,9 @@ function App() {
   const [card, setCard] = React.useState();
   const [win, setWin] = React.useState();
 
+  const [messages, setMessages] = React.useState([]);
+  console.log("🚀 ~ file: App.js ~ line 99 ~ App ~ messages", messages);
+
   const socketRef = useRef();
   const [modalOpen, setModalOpen] = React.useState(false);
   const [name, setName] = React.useState("");
@@ -110,7 +113,11 @@ function App() {
 
   useEffect(() => {
     munchkin.eventReceiver = (name, args) => {
-      console.log("===> munchkin eventReceiver ~ name, args", name, args);
+      // console.log("===> munchkin eventReceiver ~ name, args", name, args);
+      setMessages((m) => {
+        m.unshift(name);
+        return m;
+      });
     };
   }, []);
 
@@ -209,11 +216,7 @@ function App() {
   };
   const handleOpenDoor = () => {
     const result = munchkin.ouvrirPorte(players[0]);
-    console.log(
-      "🚀 ~ file: App.js ~ line 167 ~ handleOpenDoor ~ result",
-      result.type,
-      result.win
-    );
+    console.log("OPEN DOOR ~ result", result.type, result.win);
     if (result.type === "empty") {
       return;
     }
@@ -226,23 +229,26 @@ function App() {
 
   const handleTrouble = () => {
     munchkin.chercherBagarre(players[0]);
-    // socketRef.current.emit("newCard", me.name, "ferme");
   };
 
   const handleLoot = () => {
-    munchkin.pillerPiece(players[0]);
-    // socketRef.current.emit("servi");
+    const result = munchkin.ouvrirPorte(players[0]);
+    console.log("LOOT  ~ result", result.type, result.win);
+    if (result.type === "empty") {
+      return;
+    }
+    setCard(result.card);
+
+    actions.setGameStep(result.gameStep);
   };
 
   const handleCharity = () => {
     munchkin.charite(players[0]);
-    // socketRef.current.emit("servi");
   };
 
   const handleSellItems = () => {
     const cards = [];
     munchkin.sellItems(players[0], cards);
-    // socketRef.current.emit("servi");
   };
 
   const handleChange = (event) => {
@@ -370,6 +376,16 @@ function App() {
           <Button variant="contained" color="primary" onClick={handleNewDuel}>
             Fin du tour
           </Button>
+        </Grid>
+        <Grid item>
+          {messages.map((message, idx) => {
+            return (
+              <div
+                key={
+                  idx
+                }>{`${new Date().toLocaleDateString()}: ${message}`}</div>
+            );
+          })}
         </Grid>
 
         {/* <Grid item>

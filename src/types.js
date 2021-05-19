@@ -44,12 +44,14 @@ export const FIGHT_RESULT = {
 };
 
 export const GAME_STEPS = {
+  INIT: "INIT",
   OPEN_DOOR: "MONSTRE",
   TROUBLE: "TROUBLE",
+  COMBAT: "COMBAT",
+  RUN_AWAY: "RUN_AWAY",
   LOOT: "LOOT",
   CHARITY: "CHARITY",
-  END: "END",
-  RUN_AWAY: "RUN_AWAY"
+  END: "END"
 };
 
 export function perteNiveau(player) {
@@ -175,17 +177,26 @@ export const CURSES = [
   {
     type: TYPE_CARTE.MALEDICTION,
     name: "Malédiction",
-    perteItem: ITEM_TYPE.CHAUSSURES
+    perteItem: ITEM_TYPE.CHAUSSURES,
+    perteItemFn(player) {
+      player.equipement.chaussures = null;
+    }
   },
   {
     type: TYPE_CARTE.MALEDICTION,
     name: "Malédiction",
-    perteItem: ITEM_TYPE.COUVRE_CHEF
+    perteItem: ITEM_TYPE.COUVRE_CHEF,
+    perteItemFn(player) {
+      player.equipement.couvreChef = null;
+    }
   },
   {
     type: TYPE_CARTE.MALEDICTION,
     name: "Commun des mortels",
-    perteItem: "RACE"
+    perteItem: "RACE",
+    perteItemFn(player) {
+      player.race = RACES.HUMAIN;
+    }
   }
 ];
 
@@ -214,6 +225,11 @@ export const USAGE_UNIQUES = [
     peuxEtreJoueNimporteQuand: true
   }
 ];
+
+export const ITEM_SOUS_TYPE = {
+  NORMAL: "NORMAL",
+  GROS: "GROS"
+};
 
 // tresor
 export const ITEMS = [
@@ -251,7 +267,7 @@ export const ITEMS = [
     bonus: 3,
     valeur: 600,
     typeItem: ITEM_TYPE_BIG.ARMURE_GROS,
-    sousType: "GROS",
+    sousType: ITEM_SOUS_TYPE.GROS,
     interditA: CLASSES.MAGICIEN
   },
   {
@@ -268,7 +284,7 @@ export const ITEMS = [
     bonus: 4,
     valeur: 600,
     typeItem: ITEM_TYPE_BIG.DEUX_MAIN_GROS,
-    sousType: "GROS",
+    sousType: ITEM_SOUS_TYPE.GROS,
     reserveA: RACES.HUMAIN
   }
 ];

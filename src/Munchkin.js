@@ -6,6 +6,7 @@ class Munchkin {
     this.players = players;
     this.donjonDeck = donjonDeck;
     this.treasureDeck = treasureDeck;
+    this.gameStep = GAME_STEPS.OPEN_DOOR;
   }
 
   set eventReceiver(receiverFn) {
@@ -16,6 +17,33 @@ class Munchkin {
     this.receiverFn && this.receiverFn(name, args);
   }
 
+  nextStep(player) {
+    switch (this.gameStep) {
+      case GAME_STEPS.OPEN_DOOR:
+        if (player.win === true) {
+          if (player.cardsCount > 5) {
+            this.gameStep = GAME_STEPS.CHARITY;
+          } else {
+            this.gameStep = GAME_STEPS.END;
+          }
+        } else {
+        }
+        break;
+      case GAME_STEPS.TROUBLE:
+        break;
+      case GAME_STEPS.COMBAT:
+        break;
+      case GAME_STEPS.RUN_AWAY:
+        break;
+      case GAME_STEPS.LOOT:
+        break;
+      case GAME_STEPS.CHARITY:
+        break;
+      default:
+        console.log("GAME STEP ", this.gameStep);
+    }
+  }
+
   ouvrirPorte(player) {
     if (this.donjonDeck.isEmpty) {
       this.raiseEvent("La pile de cartes est vide");
@@ -24,8 +52,9 @@ class Munchkin {
       };
     }
 
+    player.win = false;
     const card = this.donjonDeck.nextCard();
-    this.raiseEvent("Ouvrir la porte", card);
+    this.raiseEvent("Ouvrir la porte : " + card.name);
     console.log(
       "🚀 ~ file: Munchkin.js ~ line 19 ~ Munchkin ~ ouvrirPorte ~ card",
       card
@@ -33,6 +62,7 @@ class Munchkin {
 
     if (card.type === TYPE_CARTE.MONSTRE) {
       const win = player.fight(card);
+      player.win = win;
       console.log(
         "🚀 ~ file: Munchkin.js ~ line 26 ~ Munchkin ~ ouvrirPorte ~ win",
         win
@@ -41,23 +71,22 @@ class Munchkin {
       if (win) {
         player.level += card.levelGain;
 
-        const treasure = this.treasureDeck.nextCard();
-        treasure && player.cards.push(treasure);
+        this.raiseEvent(`Le joueur ${player.name} a vaincu ${card.name}`);
 
-        let gameStep;
-        if (player.cardsCount > 5) {
-          gameStep = GAME_STEPS.CHARITY;
-        } else {
-          gameStep = GAME_STEPS.END;
-        }
+        const treasure = this.treasureDeck.nextCard();
+        treasure && player.equip(treasure);
+
+        this.nextStep(player);
 
         return {
           type: "fight",
           win,
           card,
-          gameStep
+          gameStep: this.gameStep
         };
       } else {
+        this.raiseEvent(`Le joueur ${player.name} a perdu contre ${card.name}`);
+
         if (card.incident) {
         } else if (card.incidentFn) {
           card.incidentFn(player);
@@ -69,13 +98,33 @@ class Munchkin {
           card
         };
       }
+    } else if (card.type === TYPE_CARTE.RACE) {
+      this.raiseEvent(`Le joueur ${player.name} est devenu ${card.name}`);
+      player.race = card.name;
+
+      return {
+        gameStep: player.hasMonsters ? GAME_STEPS.TROUBLE : GAME_STEPS.LOOT
+      };
+    } else if (card.type === TYPE_CARTE.CLASSE) {
+      this.raiseEvent(`Le joueur ${player.name} est devenu ${card.name}`);
+      player.classe = card.name;
+
+      return {
+        gameStep: player.hasMonsters ? GAME_STEPS.TROUBLE : GAME_STEPS.LOOT
+      };
     } else if (card.type === TYPE_CARTE.MALEDICTION) {
+      this.raiseEvent(
+        `Le joueur ${player.name} a reçu la malédiction ${card.name}`
+      );
+
       player.curse(card);
 
       return {
-        gameStep: GAME_STEPS.TROUBLE
+        gameStep: player.hasMonsters ? GAME_STEPS.TROUBLE : GAME_STEPS.LOOT
       };
     } else if (card.type === TYPE_CARTE.ITEM) {
+      this.raiseEvent(`Le joueur ${player.name} a reçu ${card.name}`);
+
       if (card.gainNiveau) {
         player.level++;
       } else if (card.usageUnique) {
@@ -84,10 +133,12 @@ class Munchkin {
       }
     } else {
       if (player.cardsCount > 5) {
+        this.raiseEvent(`Le joueur ${player.name} doit la charité`);
         return {
           gameStep: GAME_STEPS.CHARITY
         };
       } else {
+        this.raiseEvent(`Le joueur ${player.name} a terminé son tour`);
         return {
           gameStep: GAME_STEPS.END
         };

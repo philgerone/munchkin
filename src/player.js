@@ -1,3 +1,4 @@
+import Equipements from "./equipements";
 import { ITEM_TYPE, TYPE_CARTE, RACES } from "./types";
 
 class Player {
@@ -8,12 +9,18 @@ class Player {
     this.main = [];
     this.classe = null;
     this.race = RACES.HUMAIN;
-    this.armure = null;
-    this.couvreChef = null;
-    this.deuxMains = null;
-    this.mainGauche = null;
-    this.mainDroite = null;
-    this.chaussures = null;
+
+    this.equipements = new Equipements(this);
+  }
+
+  get hasMonsters() {
+    return (
+      this.cards.filter((card) => card.type === TYPE_CARTE.MONSTRE).length !== 0
+    );
+  }
+
+  get monsters() {
+    return this.cards.filter((card) => card.type === TYPE_CARTE.MONSTRE);
   }
 
   get wins() {
@@ -50,33 +57,11 @@ class Player {
   }
 
   unequip(card) {
-    card.porte = false;
-    switch (card.typeItem) {
-      case ITEM_TYPE.CHAUSSURES:
-        this.chaussures = null;
-        break;
-      default:
-    }
+    this.equipements.unequip(card);
   }
 
   equip(card) {
-    if (card.reserveA) {
-      if (this.race === card.reserveA) {
-        card.porte = true;
-        this.cards.push(card);
-      } else {
-        card.porte = false;
-        this.main.push(card);
-      }
-    }
-    switch (card.typeItem) {
-      case ITEM_TYPE.CHAUSSURES:
-        if (this.chaussures === null) {
-          this.chaussures = card;
-        }
-        break;
-      default:
-    }
+    this.equipements.equip(card);
   }
 
   addCards(cards) {
@@ -88,6 +73,8 @@ class Player {
   addCard(card) {
     this.cards.push(card);
   }
+
+  curse(card) {}
 
   // true if wins
   fight(monster) {

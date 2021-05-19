@@ -11,6 +11,7 @@ import FormLabel from "@material-ui/core/FormLabel";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormGroup from "@material-ui/core/FormGroup";
+import Divider from "@material-ui/core/Divider";
 
 import EuroIcon from "@material-ui/icons/Euro";
 
@@ -27,10 +28,13 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     margin: 5,
     padding: 15,
-    width: 300
+    width: 400
   },
   text: {
-    // fontSize: 13
+    fontSize: 13
+  },
+  tickSize: {
+    // transform: "scale(0.7)"
   }
 }));
 
@@ -59,88 +63,87 @@ function Player({ player }) {
     return null;
   }
 
-  const items = player.items;
-  const main = player.main;
   return (
     <Paper className={classes.paper}>
       <Typography variant="h4" gutterBottom>
         {player.name}
       </Typography>
-      <Grid>{`Niveau : ${player?.level}`}</Grid>
-      <Grid>{`Bonuses : ${player.bonuses}`}</Grid>
-      <Grid>{`Combat : ${player.fightLevel}`}</Grid>
-
-      <FormControl component="fieldset" className={classes.formControl}>
-        <FormLabel component="legend">
-          {`Equipé ${player.items.length}`}{" "}
-        </FormLabel>
-        <FormGroup>
-          {player.items.map((card) => {
-            return (
-              <FormControlLabel
-                key={card.name}
-                value={card.name}
-                control={
-                  <Checkbox
-                    checked={state[card.name]}
-                    onChange={handleChange}
-                    name={card.name}
-                  />
-                }
-                label={
-                  <Grid container>
-                    <Grid item>{card.name}</Grid>
-                    <Grid item>
-                      <EuroIcon item />
-                    </Grid>
-                    <Grid item>{card.valeur}</Grid>
-                    {/* <EuroIcon item />
+      <Grid container justify="space-between">
+        <Grid>{`Niveau : ${player?.level}`}</Grid>
+        <Grid>{`Race : ${player?.race}`}</Grid>
+        <Grid>{`Classe : ${player?.classe ?? "Aucune"}`}</Grid>
+      </Grid>
+      <Grid container justify="space-between">
+        <Grid>{`Bonuses : ${player.bonuses}`}</Grid>
+        <Grid>{`Combat : ${player.fightLevel}`}</Grid>
+      </Grid>
+      <Grid container justify="space-between">
+        <Grid item style={{ border: "1px solid lightgray", width: 200 }}>
+          <FormControl component="fieldset" className={classes.formControl}>
+            <FormLabel component="legend">
+              {`Equipé ${player.items.length}`}{" "}
+            </FormLabel>
+            <FormGroup>
+              {player.items.map((card) => {
+                return (
+                  <FormControlLabel
+                    key={card.name}
+                    value={card.name}
+                    control={
+                      <Checkbox
+                        className={classes.tickSize}
+                        checked={state[card.name]}
+                        onChange={handleChange}
+                        name={card.name}
+                      />
+                    }
+                    label={
+                      <Grid container className={classes.text}>
+                        <Grid
+                          item>{`${card.name} +${card.bonus} ${card.valeur}€ `}</Grid>
+                        {/* <EuroIcon item />
                     <Typography className={classes.text}>
                       {`${card.valeur}`}
                     </Typography> */}
-                  </Grid>
-                }
-              />
-            );
-          })}
-        </FormGroup>
-      </FormControl>
-      <FormControl component="fieldset" className={classes.formControl}>
-        <FormLabel component="legend">
-          {`Main ${player.main.length}`}{" "}
-        </FormLabel>
-        <FormGroup>
-          {player.main.map((card) => {
-            return (
-              <FormControlLabel
-                key={card.name}
-                value={card.name}
-                control={
-                  <Checkbox
-                    checked={state[card.name]}
-                    onChange={handleChange}
-                    name={card.name}
+                      </Grid>
+                    }
                   />
-                }
-                label={
-                  <Grid container>
-                    <Grid item>{card.name}</Grid>
-                    <Grid item>
-                      <EuroIcon item />
-                    </Grid>
-                    <Grid item>{card.valeur}</Grid>
-                    {/* <EuroIcon item />
-                    <Typography className={classes.text}>
-                      {`${card.valeur}`}
-                    </Typography> */}
-                  </Grid>
-                }
-              />
-            );
-          })}
-        </FormGroup>
-      </FormControl>
-
+                );
+              })}
+            </FormGroup>
+          </FormControl>
+        </Grid>
+        <Grid item style={{ border: "1px solid lightgray", width: 200 }}>
+          <FormControl component="fieldset" className={classes.formControl}>
+            <FormLabel component="legend">
+              {`Main ${player.main.length}`}{" "}
+            </FormLabel>
+            <FormGroup>
+              {player.main.map((card) => {
+                return (
+                  <FormControlLabel
+                    key={card.name}
+                    value={card.name}
+                    control={
+                      <Checkbox
+                        checked={state[card.name]}
+                        onChange={handleChange}
+                        name={card.name}
+                      />
+                    }
+                    label={
+                      <Grid container className={classes.text}>
+                        <Grid
+                          item>{`${card.name} +${card.bonus} ${card.valeur}€ `}</Grid>
+                      </Grid>
+                    }
+                  />
+                );
+              })}
+            </FormGroup>
+          </FormControl>
+        </Grid>
+      </Grid>
       {/* <ul>
         {player.cards.map((card) => {
           return <li key={card.index}>{`${card.name} : ${card.bonus}`}</li>;
