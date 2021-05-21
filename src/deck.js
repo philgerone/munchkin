@@ -6,7 +6,7 @@ class Deck {
   }
 
   get length() {
-    return this.cards.length;
+    return this.cards?.length ?? 0;
   }
 
   get isEmpty() {

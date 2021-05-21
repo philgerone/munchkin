@@ -20,8 +20,31 @@ export const setPlayerClasse = ({ state }, { playerName, classe }) => {
   }
 };
 
+export const addPlayerCardInHand = ({ state }, { playerName, card }) => {
+  const player = state.players.find((p) => p.name === playerName);
+  if (player) {
+    player.main.push(card);
+  }
+};
+
 export const setGameStep = ({ state }, value) => {
   state.gameStep = value;
+};
+
+export const setDonjonDeck = ({ state }, value) => {
+  state.donjonDeck = value;
+};
+
+export const setTreasureDeck = ({ state }, value) => {
+  state.treasureDeck = value;
+};
+
+export const addDonjonDeck = ({ state }, value) => {
+  state.donjonDeck.push(value);
+};
+
+export const addTreasureDeck = ({ state }, value) => {
+  state.treasureDeck.push(value);
 };
 
 export const addSellAmount = ({ state }, value) => {
@@ -39,11 +62,11 @@ export const setSelectedCards = ({ state }, { playerName, cardNames }) => {
   }
 };
 
-export const defausserCarte = ({ state }, { playerName, cardName }) => {
+export const defausserCarte = ({ state }, { playerName, cardName, from }) => {
   const player = state.players.find((p) => p.name === playerName);
-  const index = player.cards.findIndex((mycard) => mycard.name === cardName);
+  const index = player[from].findIndex((mycard) => mycard.name === cardName);
   if (index !== -1) {
-    const removed = player.cards.splice(index, 1);
+    const removed = player[from].splice(index, 1);
     state.cards.push(removed);
   }
 };

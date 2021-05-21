@@ -48,12 +48,13 @@ class Player {
     return this.main.length;
   }
 
-  defausse(card, deck) {
+  defausse(card) {
     const index = this.cards.findIndex((mycard) => mycard.name === card.name);
+    let removed;
     if (index !== -1) {
-      const removed = this.cards.splice(index, 1);
-      deck.cards.push(removed);
+      removed = this.cards.splice(index, 1);
     }
+    return removed;
   }
 
   unequip(card) {

@@ -45,8 +45,11 @@ function Player({ playerName }) {
   };
 
   const hadleItemDroppedOnRace = (item) => {
-    const card = player.cards.find((c) => c.name === item.cardName);
-
+    actions.defausserCarte({
+      playerName: player.name,
+      cardName: item.cardName,
+      from: item.from
+    });
     actions.setPlayerRace({ playerName: player.name, race: item.cardName });
   };
 
@@ -68,23 +71,29 @@ function Player({ playerName }) {
   return (
     <Paper className={classes.paper}>
       <Grid container justify="space-between">
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h5" gutterBottom>
           {player.name}
         </Typography>
         <Grid>{`Niveau : ${player?.level}`}</Grid>
       </Grid>
       <Grid container justify="space-between">
         <DropTarget onItemDropped={hadleItemDroppedOnRace}>
-          <Grid>
+          <Grid container alignItems="center" justify="space-between">
             {`Race : ${player?.race}`}
-            <DeleteIcon onClick={handleDeleteRace} />
+            <DeleteIcon
+              onClick={handleDeleteRace}
+              style={{ cursor: "pointer" }}
+            />
           </Grid>
         </DropTarget>
 
         <DropTarget onItemDropped={hadleItemDroppedOnClasse}>
-          <Grid>
+          <Grid container alignItems="center" justify="space-between">
             {`Classe : ${player?.classe ?? "Aucune"}`}
-            <DeleteIcon onClick={handleDeleteClasse} />
+            <DeleteIcon
+              onClick={handleDeleteClasse}
+              style={{ cursor: "pointer" }}
+            />
           </Grid>
         </DropTarget>
       </Grid>

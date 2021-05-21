@@ -1,5 +1,5 @@
 import { useActions } from "./overmind";
-import { GAME_STEPS, TYPE_CARTE } from "./types";
+import { DECK_TYPE, GAME_STEPS, TYPE_CARTE } from "./types";
 
 class Munchkin {
   constructor(players, donjonDeck, treasureDeck) {
@@ -13,8 +13,39 @@ class Munchkin {
     this.receiverFn = receiverFn;
   }
 
+  set stateChangedReceiver(receiverFn) {
+    this.stateChangedReceiverFn = receiverFn;
+  }
+
+  defausserCarte(playerName, cardName, from) {
+    const player = this.players.find((p) => p.name === playerName);
+    const index = player[from].findIndex((mycard) => mycard.name === cardName);
+    if (index !== -1) {
+      const removed = player[from].splice(index, 1);
+      if (removed.deck === DECK_TYPE.DONJON) {
+        this.donjonDeck.cards.push(removed);
+
+        this.raiseStateChangedEvent("addDonjon", removed);
+      } else {
+        this.treasureDeck.cards.push(removed);
+        this.raiseStateChangedEvent("addTresor", removed);
+      }
+    }
+  }
+
   raiseEvent(name, args) {
     this.receiverFn && this.receiverFn(name, args);
+  }
+
+  raiseStateChangedEvent(name, args) {
+    this.stateChangedReceiverFn && this.stateChangedReceiverFn(name, args);
+  }
+
+  startTimer() {
+    this.raiseEvent("Le timer à démarré");
+    setTimeout(() => {
+      this.raiseEvent("Le timer est terminé");
+    }, 3000);
   }
 
   nextStep(player) {
@@ -94,7 +125,8 @@ class Munchkin {
 
         if (card.incident) {
         } else if (card.incidentFn) {
-          card.incidentFn(player);
+          const message = card.incidentFn(player);
+          this.raiseEvent(message);
         }
 
         return {
@@ -104,15 +136,17 @@ class Munchkin {
         };
       }
     } else if (card.type === TYPE_CARTE.RACE) {
-      this.raiseEvent(`Le joueur ${player.name} est devenu ${card.name}`);
-      player.race = card.name;
+      this.raiseEvent(`Le joueur ${player.name} a reçu ${card.name}`);
+      // player.race = card.name;
+      player.equip(card);
 
       return {
         gameStep: player.hasMonsters ? GAME_STEPS.TROUBLE : GAME_STEPS.LOOT
       };
     } else if (card.type === TYPE_CARTE.CLASSE) {
-      this.raiseEvent(`Le joueur ${player.name} est devenu ${card.name}`);
-      player.classe = card.name;
+      this.raiseEvent(`Le joueur ${player.name} a reçu ${card.name}`);
+      // player.classe = card.name;
+      player.equip(card);
 
       return {
         gameStep: player.hasMonsters ? GAME_STEPS.TROUBLE : GAME_STEPS.LOOT

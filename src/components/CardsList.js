@@ -12,6 +12,7 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormGroup from "@material-ui/core/FormGroup";
 import Divider from "@material-ui/core/Divider";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import EuroIcon from "@material-ui/icons/Euro";
 
@@ -72,7 +73,10 @@ function CardsList({ player, type, onItemDropped }) {
     let cardText = "";
     switch (card.type) {
       case TYPE_CARTE.MALEDICTION:
-        cardText = `${card.name} Perte de ${card.perteItem} `;
+        cardText = `${card.name}`;
+        break;
+      case TYPE_CARTE.MONSTRE:
+        cardText = `${card.name} Niveau ${card.level} (${card.treasureGain} trésor)`;
         break;
       case TYPE_CARTE.ITEM:
         cardText = `${card.name} +${card.bonus} ${card.valeur}€ `;
@@ -84,6 +88,16 @@ function CardsList({ player, type, onItemDropped }) {
     return cardText;
   }
 
+  const LabelContent = ({ card }) => {
+    const title = `${card.type} ${card.tooltip ?? ""}`;
+    return (
+      <Tooltip title={title} placement="left">
+        <Grid container className={classes.text}>
+          <Grid item>{getCardText(card)}</Grid>
+        </Grid>
+      </Tooltip>
+    );
+  };
   return (
     <DropTarget onItemDropped={itemDropped} className={classes.drop}>
       <FormControl component="fieldset" className={classes.formControl}>
@@ -109,11 +123,7 @@ function CardsList({ player, type, onItemDropped }) {
                       name={card.name}
                     />
                   }
-                  label={
-                    <Grid container className={classes.text}>
-                      <Grid item>{getCardText(card)}</Grid>
-                    </Grid>
-                  }
+                  label={<LabelContent card={card} />}
                 />
               </Drag>
             );

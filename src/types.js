@@ -1,4 +1,11 @@
+import { randomInt } from "./helpers";
+
 export const RUNAWAY_MIN_DICE = 5;
+
+export const DECK_TYPE = {
+  DONJON: "DONJON",
+  TRESOR: "TRESOR"
+};
 
 export const ITEM_TYPE = {
   MAIN: "MAIN",
@@ -54,9 +61,9 @@ export const GAME_STEPS = {
   END: "END"
 };
 
-export function perteNiveau(player) {
+export function perteNiveau(player, valeur = 1) {
   if (player.level > 1) {
-    player.level--;
+    player.level = player.level - perteNiveau;
   }
 }
 
@@ -64,19 +71,23 @@ export function perteNiveau(player) {
 export const CARTES_CLASSE = [
   {
     type: TYPE_CARTE.CLASSE,
-    name: CLASSES.GUERRIER
+    deck: DECK_TYPE.DONJON,
+    name: "Classe " + CLASSES.GUERRIER
   },
   {
     type: TYPE_CARTE.CLASSE,
-    name: CLASSES.PRETRE
+    deck: DECK_TYPE.DONJON,
+    name: "Classe " + CLASSES.PRETRE
   },
   {
     type: TYPE_CARTE.CLASSE,
-    name: CLASSES.VOLEUR
+    deck: DECK_TYPE.DONJON,
+    name: "Classe " + CLASSES.VOLEUR
   },
   {
     type: TYPE_CARTE.CLASSE,
-    name: CLASSES.MAGICIEN
+    deck: DECK_TYPE.DONJON,
+    name: "Classe " + CLASSES.MAGICIEN
   }
 ];
 
@@ -84,15 +95,18 @@ export const CARTES_CLASSE = [
 export const CARTES_RACE = [
   {
     type: TYPE_CARTE.RACE,
-    name: RACES.NAIN
+    deck: DECK_TYPE.DONJON,
+    name: "Race " + RACES.NAIN
   },
   {
     type: TYPE_CARTE.RACE,
-    name: RACES.HALFELIN
+    deck: DECK_TYPE.DONJON,
+    name: "Race " + RACES.HALFELIN
   },
   {
     type: TYPE_CARTE.RACE,
-    name: RACES.ELFE
+    deck: DECK_TYPE.DONJON,
+    name: "Race " + RACES.ELFE
   }
 ];
 
@@ -100,7 +114,9 @@ export const CARTES_RACE = [
 export const MONSTERS = [
   {
     type: TYPE_CARTE.MONSTRE,
+    deck: DECK_TYPE.DONJON,
     name: "Mucus baveux",
+    tooltip: "+4 contre les Elfes",
     level: 1,
     levelGain: 1,
     treasureGain: 1,
@@ -114,14 +130,18 @@ export const MONSTERS = [
       );
       if (index !== -1) {
         player.cards.splice(index, 1);
+        return `Le joueur ${player.name} a perdu ses chaussures`;
       } else {
         perteNiveau(player);
+        return `Le joueur ${player.name} a perdu 1 niveau`;
       }
     }
   },
   {
     type: TYPE_CARTE.MONSTRE,
+    deck: DECK_TYPE.DONJON,
     name: "Rat musclé",
+    tooltip: "+3 contre les Prêtres",
     level: 1,
     levelGain: 1,
     treasureGain: 1,
@@ -131,86 +151,142 @@ export const MONSTERS = [
     },
     incidentFn(player) {
       perteNiveau(player);
+      return `Le joueur ${player.name} a perdu 1 niveau`;
+    }
+  },
+  {
+    type: TYPE_CARTE.MONSTRE,
+    deck: DECK_TYPE.DONJON,
+    name: "3872 orques",
+    level: 10,
+    levelGain: 1,
+    treasureGain: 3,
+    bonusContre: {
+      race: RACES.NAIN,
+      bonus: 6
+    },
+    incident: {
+      type: "DE",
+      value: {
+        1: "DEAD",
+        2: "DEAD",
+        3: -3,
+        4: -4,
+        5: -5,
+        6: -6
+      }
+    },
+    incidentFn(player) {
+      const dice = randomInt(1, 6);
+      switch (dice) {
+        case 1:
+          player.dead = true;
+          return `Le joueur ${player.name} est mort`;
+        case 2:
+          player.dead = true;
+          return `Le joueur ${player.name} est mort`;
+        case 3:
+          perteNiveau(player, 3);
+          break;
+        case 4:
+          perteNiveau(player, 4);
+          break;
+        case 5:
+          perteNiveau(player, 5);
+          break;
+        case 6:
+          perteNiveau(player, 6);
+          break;
+        default:
+      }
+      return `Le joueur ${player.name} a perdu ${dice} niveaux`;
+    }
+  },
+  {
+    type: TYPE_CARTE.MONSTRE,
+    deck: DECK_TYPE.DONJON,
+    name: "Lépreuxchaun",
+    level: 4,
+    levelGain: 1,
+    treasureGain: 2,
+    bonusContre: {
+      race: RACES.ELFE,
+      bonus: 5
+    },
+    incident: {
+      type: TYPE_CARTE.ITEM,
+      value: 2
+    },
+    incidentFn(player) {
+      // prend 2 objects
+      player.cards.pop();
+      player.cards.pop();
+
+      return `Le joueur ${player.name} a perdu 2 objets`;
     }
   }
-  // {
-  //   type: TYPE_CARTE.MONSTRE,
-  //   name: "3872 orques",
-  //   level: 10,
-  //   levelGain: 1,
-  //   treasureGain: 3,
-  //   bonusContre: {
-  //     race: RACES.NAIN,
-  //     bonus: 6
-  //   },
-  //   incident: {
-  //     type: "DE",
-  //     value: {
-  //       1: "DEAD",
-  //       2: "DEAD",
-  //       3: -3,
-  //       4: -4,
-  //       5: -5,
-  //       6: -6
-  //     }
-  //   }
-  // },
-  // {
-  //   type: TYPE_CARTE.MONSTRE,
-  //   name: "Lépreuxchaun",
-  //   level: 4,
-  //   levelGain: 1,
-  //   treasureGain: 2,
-  //   bonusContre: {
-  //     race: RACES.ELFE,
-  //     bonus: 5
-  //   },
-  //   incident: {
-  //     type: TYPE_CARTE.ITEM,
-  //     value: 2
-  //   }
-  // }
 ];
 
 // donjon
 export const CURSES = [
   {
     type: TYPE_CARTE.MALEDICTION,
-    name: "Malédiction",
+    deck: DECK_TYPE.DONJON,
+    name: "Malédiction 1",
+    tooltip: "Perte de chaussures",
     perteItem: ITEM_TYPE.CHAUSSURES,
     perteItemFn(player) {
       player.equipement.chaussures = null;
+      return `Le joueur ${player.name} a perdu ses chaussures`;
     }
   },
   {
     type: TYPE_CARTE.MALEDICTION,
-    name: "Malédiction",
+    deck: DECK_TYPE.DONJON,
+    name: "Malédiction 2",
+    tooltip: "Perte de couvre chef",
     perteItem: ITEM_TYPE.COUVRE_CHEF,
     perteItemFn(player) {
       player.equipement.couvreChef = null;
+      return `Le joueur ${player.name} a perdu son couvre chef`;
     }
   },
   {
     type: TYPE_CARTE.MALEDICTION,
+    deck: DECK_TYPE.DONJON,
     name: "Commun des mortels",
+    tooltip: "Perte de race",
     perteItem: "RACE",
     perteItemFn(player) {
       player.race = RACES.HUMAIN;
+      return `Le joueur ${player.name} a perdu sa race`;
     }
   }
 ];
 
-export const DONJONS = [
+function randomizeArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * i);
+    const temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
+}
+
+const _cartesDonjons = [
   ...CARTES_CLASSE,
   ...CARTES_RACE,
   ...MONSTERS,
   ...CURSES
 ];
+randomizeArray(_cartesDonjons);
+export const DONJONS = _cartesDonjons;
 
 // tresor
 export const GAIN_NIVEAUX = [
   {
     type: TYPE_CARTE.GAIN_NIVEAU,
+    deck: DECK_TYPE.TRESOR,
     name: "Invocation de règles obscures",
     gainNiveau: 1
   }
@@ -220,6 +296,7 @@ export const GAIN_NIVEAUX = [
 export const USAGE_UNIQUES = [
   {
     type: TYPE_CARTE.USAGE_UNIQUE,
+    deck: DECK_TYPE.TRESOR,
     name: "Anneau de souhait",
     annuleMalediction: true,
     peuxEtreJoueNimporteQuand: true
@@ -235,6 +312,17 @@ export const ITEM_SOUS_TYPE = {
 export const ITEMS = [
   {
     type: TYPE_CARTE.ITEM,
+    deck: DECK_TYPE.TRESOR,
+    name: "Anneau de souhait",
+    tooltip: "Annule n'importe quelle malédiction",
+    annuleMalediction: true,
+    bonus: 0,
+    valeur: 500,
+    usageUnique: true
+  },
+  {
+    type: TYPE_CARTE.ITEM,
+    deck: DECK_TYPE.TRESOR,
     name: "Potion de poison enflammé",
     bonus: 3,
     valeur: 100,
@@ -242,20 +330,25 @@ export const ITEMS = [
   },
   {
     type: TYPE_CARTE.ITEM,
+    deck: DECK_TYPE.TRESOR,
     name: "Cape d'ombre",
+    tooltip: "Réservée aux voleurs",
     bonus: 4,
     valeur: 600,
     reserveA: CLASSES.VOLEUR
   },
   {
     type: TYPE_CARTE.ITEM,
+    deck: DECK_TYPE.TRESOR,
     name: "Cape d'ombre",
+    tooltip: "Réservée aux voleurs",
     bonus: 4,
     valeur: 600,
     reserveA: CLASSES.VOLEUR
   },
   {
     type: TYPE_CARTE.ITEM,
+    deck: DECK_TYPE.TRESOR,
     name: "Sandales de protection",
     bonus: 0,
     valeur: 700,
@@ -263,6 +356,7 @@ export const ITEMS = [
   },
   {
     type: TYPE_CARTE.ITEM,
+    deck: DECK_TYPE.TRESOR,
     name: "Armure de mithril",
     bonus: 3,
     valeur: 600,
@@ -272,6 +366,7 @@ export const ITEMS = [
   },
   {
     type: TYPE_CARTE.ITEM,
+    deck: DECK_TYPE.TRESOR,
     name: "Brochette de rat de mithril",
     bonus: 1,
     valeur: 0,
@@ -280,6 +375,7 @@ export const ITEMS = [
   },
   {
     type: TYPE_CARTE.ITEM,
+    deck: DECK_TYPE.TRESOR,
     name: "Hallebarde Suisse multifonctions",
     bonus: 4,
     valeur: 600,
@@ -293,4 +389,6 @@ export const createCartesTresor = () => {
   return [...GAIN_NIVEAUX, ...ITEMS];
 };
 
-export const TRESORS = [...GAIN_NIVEAUX, ...ITEMS];
+const _cartesTresors = [...GAIN_NIVEAUX, ...ITEMS];
+randomizeArray(_cartesTresors);
+export const TRESORS = _cartesTresors;
