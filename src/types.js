@@ -394,3 +394,168 @@ export const createCartesTresor = () => {
 const _cartesTresors = [...GAIN_NIVEAUX, ...ITEMS];
 randomizeArray(_cartesTresors);
 export const TRESORS = _cartesTresors;
+{
+  type: TYPE_CARTE.MONSTRE,
+  deck: DECK_TYPE.DONJON,
+  name: "Dragon dr plutonium",
+  tooltip: "Ne poursuit aucun personnage de niveau 5 ou inférieur",
+  level: 20,
+  levelGain: 2,
+  treasureGain: 5,
+  bonusContre: {
+    race:,
+    bonus:
+  },
+  incidentFn(player) {
+    player.dead = true
+    return `Le joueur ${player.name} est mort roti et dévoré`;
+  }
+},
+{
+  type: TYPE_CARTE.MONSTRE,
+  deck: DECK_TYPE.DONJON,
+  name: "Balrog charolais",
+  tooltip: "Ne poursuit aucun personnage de niveau 4 ou inférieur",
+  level: 18,
+  levelGain: 2,
+  treasureGain: 5,
+  bonusContre: {
+    race:,
+    bonus:
+  },
+  incidentFn(player) {
+    player.dead = true
+    return `Le joueur ${player.name} est mort fouetté`;
+  }
+},
+{
+  type: TYPE_CARTE.MONSTRE,
+  deck: DECK_TYPE.DONJON,
+  name: "Céphalopodzilla",
+  tooltip: "+4 contre les elfes, ne pousuit pas les personnages de niveau 4 ou inférieur sauf les elfes",
+  level: 18,
+  levelGain: 2,
+  treasureGain: 4,
+  bonusContre: {
+    race: RACE.ELFE,
+    bonus: 4
+  },
+  incidentFn(player) {
+    return `Le joueur ${player.name} est mort, mort, mort et re-mort`;
+  }
+},
+{
+  type: TYPE_CARTE.MONSTRE,
+  deck: DECK_TYPE.DONJON,
+  name: "Hippogriffe",
+  tooltip: "Ne poursuit pas les personnages de niveau 3 ou inférieure",
+  level: 16,
+  levelGain: 2,
+  treasureGain: 4,
+  bonusContre: {
+    race:,
+    bonus:
+  },
+  incidentFn(player) {
+    return `Le joueur ${player.name} est mort piétiné et tout les joueurs peuvent lui prendre un trésor dans sa main ou devant lui`;
+  }
+},
+{
+  type: TYPE_CARTE.MONSTRE,
+  deck: DECK_TYPE.DONJON,
+  name: "Tut-tuuut-Ankh-Ammon",
+  tooltip: "Ne poursuit pas les personnages de niveau 3 ou inférieur, les joueurs perdent 2 niveaux même si ils dégerpissent",
+  level: 16,
+  levelGain: 2,
+  treasureGain: 4,
+  bonusContre: {
+    race:,
+    bonus:
+  },
+  incidentFn(player) {
+    perteNiveau(player, 2)
+    return `Le joueur ${player.name} a perdu 2 niveaux et a perdu toute les cartes de sa main`;
+  }
+},
+{
+  type: TYPE_CARTE.MONSTRE,
+  deck: DECK_TYPE.DONJON,
+  name: "René grophage et fils dépanneurs en chirurgie",
+  tooltip: "Ne poursuit pas les personnages de niveau 3 ou inférieur, les joueurs perdent 2 niveaux même si ils dégerpissent",
+  level: 16,
+  levelGain: 2,
+  treasureGain: 4,
+  bonusContre: {
+    race:,
+    bonus:
+  },
+  incidentFn(player) {
+    player.level = 1
+    return `Le joueur ${player.name} a perdu 2 niveaux`;
+  }
+},
+{
+  type: TYPE_CARTE.MONSTRE,
+  deck: DECK_TYPE.DONJON,
+  name: "Golem fracasse",
+  tooltip: "Vous pouvez lui dire coucou et partir sans rien ou le combattre, les halfelins n'ont pas le choix de combattre",
+  level: 14,
+  levelGain: 1,
+  treasureGain: 4,
+  bonusContre: {
+    race: RACE.HALFELIN ,
+    bonus: 0
+  },
+  incidentFn(player) {
+    return `Le joueur ${player.name} a été mort manger car le Golem avait la dalle`;
+  }
+},
+{
+  type: TYPE_CARTE.MONSTRE,
+  deck: DECK_TYPE.DONJON,
+  name: "Représentant en assurances",
+  tooltip: "Vous le combattez que avec vos bonus",
+  level: 14,
+  levelGain: 1,
+  treasureGain: 4,
+  bonusContre: {
+    race:,
+    bonus:
+  },
+  incidentFn(player) {
+    return `Le joueur ${player.name} doit défausser de quoi faire 1k de pièce d'or ou tout jetter`;
+  }
+},
+{
+  type: TYPE_CARTE.MONSTRE,
+  deck: DECK_TYPE.DONJON,
+  name: "Horreur non-euclidienne indicible",
+  tooltip: "+4 contre les guerriers",
+  level: 14,
+  levelGain: 1,
+  treasureGain: 4,
+  bonusContre: {
+    race: ,
+    classe : CLASSE.GUERRIER ,
+    bonus: 4
+  },
+  incidentFn(player) {
+    return `Le joueur ${player.name} est mort piétiné et tout les joueurs peuvent lui prendre un trésor dans sa main ou devant lui`;
+  }
+},
+{
+  type: TYPE_CARTE.MONSTRE,
+  deck: DECK_TYPE.DONJON,
+  name: "",
+  tooltip: "",
+  level: ,
+  levelGain: ,
+  treasureGain: ,
+  bonusContre: {
+    race:,
+    bonus:
+  },
+  incidentFn(player) {
+    return `Le joueur ${player.name} `;
+  }
+},
