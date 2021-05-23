@@ -2,7 +2,7 @@ import Player from "./player";
 import { RACES } from "./types";
 
 describe("Player", () => {
-  it("sould create a player", () => {
+  it("should create a player", () => {
     const player = new Player("Pge");
 
     expect(player.name).toEqual("Pge");

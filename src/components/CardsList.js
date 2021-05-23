@@ -102,33 +102,35 @@ function CardsList({ player, type, onItemDropped }) {
     <DropTarget onItemDropped={itemDropped} className={classes.drop}>
       <FormControl component="fieldset" className={classes.formControl}>
         <FormLabel component="legend">{`${label} ${items.length}`} </FormLabel>
-        <FormGroup>
-          {items.map((card, index) => {
-            const dataItem = {
-              playerName: player.name,
-              cardName: card.name,
-              from: type,
-              value: card.valeur
-            };
-            return (
-              <Drag dataItem={dataItem}>
-                <FormControlLabel
-                  key={card.name}
-                  value={card.name}
-                  control={
-                    <Checkbox
-                      className={classes.tickSize}
-                      checked={state[card.name]}
-                      onChange={handleChange}
-                      name={card.name}
-                    />
-                  }
-                  label={<LabelContent card={card} />}
-                />
-              </Drag>
-            );
-          })}
-        </FormGroup>
+        <div style_={{ height: 100, overflowY: "scroll" }}>
+          <FormGroup>
+            {items.map((card, index) => {
+              const dataItem = {
+                playerName: player.name,
+                cardName: card.name,
+                from: type,
+                value: card.valeur
+              };
+              return (
+                <Drag dataItem={dataItem}>
+                  <FormControlLabel
+                    key={card.name}
+                    value={card.name}
+                    control={
+                      <Checkbox
+                        className={classes.tickSize}
+                        checked={state[card.name]}
+                        onChange={handleChange}
+                        name={card.name}
+                      />
+                    }
+                    label={<LabelContent card={card} />}
+                  />
+                </Drag>
+              );
+            })}
+          </FormGroup>
+        </div>
       </FormControl>
     </DropTarget>
   );

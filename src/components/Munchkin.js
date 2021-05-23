@@ -58,7 +58,7 @@ import SecurityIcon from "@material-ui/icons/Security";
 import { DropTarget } from "./DropTarget";
 import Vente from "./Vente";
 
-const ENDPOINT = "http://192.168.0.82:8081";
+const ENDPOINT = "http://192.168.1.82:8081";
 
 const ITEM_HEIGHT = 48;
 
@@ -311,21 +311,6 @@ function MunchkinApp() {
         }}>
         Timer
       </button> */}
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            edge="start"
-            className={classes.menuButton}
-            color="inherit"
-            aria-label="menu"
-            onClick={handleClick}>
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" className={classes.title}>
-            {`${state.title} ${me?.name ? "du joueur " + me?.name : ""}`}
-          </Typography>
-        </Toolbar>
-      </AppBar>
 
       <Menu
         id="fade-menu"
@@ -339,10 +324,10 @@ function MunchkinApp() {
         <MenuItem onClick={handlePlay}>Jouer</MenuItem>
       </Menu>
 
-      <Grid>
+      {/* <Grid>
         <Typography variant="h6">Joueurs en ligne</Typography>
         <Typography>{`${onlinePlayers.map((p) => p.name).join()}`}</Typography>
-      </Grid>
+      </Grid> */}
       <Divider />
       <Grid
         container

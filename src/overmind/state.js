@@ -58,6 +58,7 @@ export const state = {
   title: "Munchkin",
   currentPlayer: new Player("Pge"),
   gameStep: GAME_STEPS.OPEN_DOOR,
+  onlinePlayers: [],
   players: [],
   donjonDeck: [],
   treasureDeck: [],
