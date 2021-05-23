@@ -5,15 +5,13 @@ import Typography from "@material-ui/core/Typography";
 
 import { useState } from "../overmind";
 
-function ChatRoom() {
+function ChatRoom({ socketRef }) {
   const state = useState();
   return (
     <Grid>
       <Link to="/">Home</Link>
       <Typography variant="h6">Joueurs en ligne</Typography>
-      <Typography>{`${state.onlinePlayers
-        .map((p) => p.name)
-        .join()}`}</Typography>
+      <Typography>{`${state.players.map((p) => p.name).join()}`}</Typography>
     </Grid>
   );
 }

@@ -2,8 +2,6 @@ import React, { useRef, useEffect } from "react";
 
 import donjonCard from "../images/donjon.png";
 import tresorCard from "../images/tresor.png";
-import nez from "../images/nez flottant.png";
-import dragon from "../images/dragon de plutonium.png";
 
 import { useState, useActions, useEffects, useReaction } from "../overmind";
 
@@ -11,35 +9,18 @@ import { makeStyles } from "@material-ui/core/styles";
 import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import TextField from "@material-ui/core/TextField";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
 
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import MenuIcon from "@material-ui/icons/Menu";
 
-import IconButton from "@material-ui/core/IconButton";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
 import Fade from "@material-ui/core/Fade";
 
-import DeleteIcon from "@material-ui/icons/Delete";
-import EuroIcon from "@material-ui/icons/Euro";
-
-import Decks from "./Decks";
 import Player from "./Player";
 
-import socketIOClient from "socket.io-client";
 import Card from "./Card";
 import Munchkin from "../Munchkin";
-import { Item } from "../card";
-import PlayerClass from "../player";
+
 import DeckClass from "../deck";
 
 import { monsters, treasures, players } from "../overmind/state";
@@ -55,8 +36,6 @@ import {
   ENDPOINT
 } from "../types";
 
-import SecurityIcon from "@material-ui/icons/Security";
-import { DropTarget } from "./DropTarget";
 import Vente from "./Vente";
 
 const ITEM_HEIGHT = 48;
@@ -93,17 +72,12 @@ const deckDonjon = new DeckClass(DONJONS);
 const deckTresor = new DeckClass(cartesTresor);
 let munchkin;
 
-function MunchkinApp() {
-  const [onlinePlayers, setOnlinePlayers] = React.useState([]);
+function MunchkinApp({ socketRef }) {
   const [card, setCard] = React.useState();
   const [win, setWin] = React.useState();
 
   const [messages, setMessages] = React.useState([]);
-  console.log("🚀 ~ file: App.js ~ line 99 ~ App ~ messages", messages);
 
-  const socketRef = useRef();
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const [name, setName] = React.useState("");
   const classes = useStyles();
   const state = useState();
   const actions = useActions();
@@ -141,59 +115,6 @@ function MunchkinApp() {
     };
   }, []);
 
-  useEffect(() => {
-    const _name = localStorage.getItem("name");
-    setName(_name ?? "");
-
-    const player = state.players.find((player) => player.name === _name);
-    player && actions.setMe(player);
-  }, []);
-
-  useEffect(() => {
-    const socket = socketIOClient(ENDPOINT);
-    socketRef.current = socket;
-    socket.on("message", (name, args) => {
-      console.log(
-        "🚀 ~ file: App.js ~ line 115 ~ socket.on ~ name, args",
-        name,
-        args
-      );
-    });
-    socket.on("hello", (data) => {
-      console.log("🚀 ~ file: App.js ~ line 74 ~ socket.on ~ HELLO", data);
-    });
-    // socket.on("emtyDeck", () => {
-    //   console.log("emty deck");
-    // });
-    // socket.on("deck", (sdeck) => {
-    //   console.log("🚀 ~ file: App.js ~ line 86 ~ socket.on ~ sdeck", sdeck);
-    //   setDeck(sdeck);
-    // });
-    // socket.on("card", (scard) => {
-    //   setCard(scard);
-    // });
-    socket.on("newGame", (players, sdeck) => {
-      console.log("🚀 ~ file: App.js ~ line 83 ~ socket.on ~ newGame", players);
-      // actions.setPlayers(players);
-      // setCard(null);
-      // setDeck(sdeck);
-    });
-    socket.on("players", (players) => {
-      console.log("🚀 ~ file: App.js ~ line 83 ~ socket.on ~ players", players);
-      setOnlinePlayers(players);
-    });
-    socket.on("playerAlreadyExist", (name) => {
-      alert(`Le joueur ${name} existe déjà`);
-    });
-
-    // CLEAN UP THE EFFECT
-    return () => {
-      socket.disconnect();
-      socketRef.current = null;
-    };
-    //
-  }, []);
-
   const handleNewGame = () => {
     setAnchorEl(null);
     socketRef.current.emit("newGame");
@@ -204,31 +125,12 @@ function MunchkinApp() {
     socketRef.current.emit("chooseDealer");
   };
 
-  const handlePlay = () => {
-    setAnchorEl(null);
-    setModalOpen(true);
-  };
-
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleModalOpen = () => {
-    setModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setModalOpen(false);
-  };
-
-  const handleEnterGame = () => {
-    localStorage.setItem("name", name);
-    socketRef.current.emit("newPlayer", name);
-    setModalOpen(false);
   };
 
   const handleNewDuel = () => {
@@ -277,10 +179,6 @@ function MunchkinApp() {
     munchkin.sellItems(players[0], cards);
   };
 
-  const handleChange = (event) => {
-    setName(event.target.value);
-  };
-
   const handleCardItemDropped = (item) => {
     console.log(
       "🚀 ~ file: App.js ~ line 259 ~ handleCardItemDropped ~ item",
@@ -310,24 +208,6 @@ function MunchkinApp() {
         }}>
         Timer
       </button> */}
-
-      <Menu
-        id="fade-menu"
-        anchorEl={anchorEl}
-        keepMounted
-        open={open}
-        onClose={handleClose}
-        TransitionComponent={Fade}>
-        <MenuItem onClick={handleNewGame}>Nouvelle partie</MenuItem>
-        {/* <MenuItem onClick={handleChooseDealer}>Choisir dealer</MenuItem> */}
-        <MenuItem onClick={handlePlay}>Jouer</MenuItem>
-      </Menu>
-
-      {/* <Grid>
-        <Typography variant="h6">Joueurs en ligne</Typography>
-        <Typography>{`${onlinePlayers.map((p) => p.name).join()}`}</Typography>
-      </Grid> */}
-      <Divider />
       <Grid
         container
         direction="column"
@@ -344,29 +224,27 @@ function MunchkinApp() {
           justify="space-evenly"
           alignItems="center"
           style={{ border: "1px solid lightgray" }}>
-          <Grid item>
+          {/* <Grid item>
             <DropTarget onItemDropped={handleDefausseItemDropped}>
               <DeleteIcon style={{ transform: "scale(10)" }} />
             </DropTarget>
-          </Grid>
+          </Grid> */}
 
-          <Grid item>
-            <Card card={DONJONS[0]} />
-          </Grid>
+          <Grid item>{/* <Card card={DONJONS[0]} /> */}</Grid>
           <Grid item>
             <div style={{ position: "relative", cursor: "pointer" }}>
               <img
                 className={classes.card}
                 src={donjonCard}
                 alt={"nez"}
-                width="132"
-                height="204"
+                width="102"
+                height="174"
               />
               <div
                 style={{
                   position: "absolute",
                   top: 0,
-                  left: 20
+                  left: 15
                 }}>{`Donjon : ${state.donjonDeck.length}`}</div>
             </div>
           </Grid>
@@ -376,8 +254,8 @@ function MunchkinApp() {
                 className={classes.card}
                 src={tresorCard}
                 alt={"nez"}
-                width="132"
-                height="204"
+                width="102"
+                height="174"
               />
               <div
                 style={{
@@ -490,37 +368,6 @@ function MunchkinApp() {
             height="204"
           />
         </Grid> */}
-
-        <Dialog
-          open={modalOpen}
-          onClose={handleModalClose}
-          aria-labelledby="form-dialog-title">
-          {/* <DialogTitle id="form-dialog-title">Nom</DialogTitle> */}
-          <DialogContent>
-            <DialogContentText>Entrez votre nom.</DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="name"
-              label="Nom du joueur"
-              type="text"
-              fullWidth
-              value={name}
-              onChange={handleChange}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleModalClose} color="primary">
-              Annuler
-            </Button>
-            <Button
-              onClick={handleEnterGame}
-              color="primary"
-              disabled={name.length === 0}>
-              Ok
-            </Button>
-          </DialogActions>
-        </Dialog>
       </Grid>
     </>
   );

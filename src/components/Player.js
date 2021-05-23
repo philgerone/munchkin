@@ -6,7 +6,7 @@ import Paper from "@material-ui/core/Paper";
 import DeleteIcon from "@material-ui/icons/Delete";
 
 import CardsList from "./CardsList";
-import { RACES } from "../types";
+import { ITEM_TYPE, RACES, TYPE_CARTE } from "../types";
 import { useActions, useState } from "../overmind";
 import { DropTarget } from "./DropTarget";
 
@@ -45,6 +45,10 @@ function Player({ playerName }) {
   };
 
   const hadleItemDroppedOnRace = (item) => {
+    if (item.cardName !== TYPE_CARTE.RACE) {
+      return;
+    }
+
     actions.defausserCarte({
       playerName: player.name,
       cardName: item.cardName,
@@ -54,6 +58,15 @@ function Player({ playerName }) {
   };
 
   const hadleItemDroppedOnClasse = (item) => {
+    if (item.cardName !== TYPE_CARTE.CLASSE) {
+      return;
+    }
+
+    actions.defausserCarte({
+      playerName: player.name,
+      cardName: item.cardName,
+      from: item.from
+    });
     actions.setPlayerClasse({ playerName: player.name, race: item.cardName });
   };
 
