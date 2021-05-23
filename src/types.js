@@ -1,5 +1,7 @@
 import { randomInt } from "./helpers";
 
+export const ENDPOINT = "http://192.168.1.82:8081";
+
 export const RUNAWAY_MIN_DICE = 5;
 
 export const DECK_TYPE = {

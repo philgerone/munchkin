@@ -51,14 +51,13 @@ import {
   MONSTERS,
   ITEMS,
   CURSES,
-  GAME_STEPS
+  GAME_STEPS,
+  ENDPOINT
 } from "../types";
 
 import SecurityIcon from "@material-ui/icons/Security";
 import { DropTarget } from "./DropTarget";
 import Vente from "./Vente";
-
-const ENDPOINT = "http://192.168.1.82:8081";
 
 const ITEM_HEIGHT = 48;
 
