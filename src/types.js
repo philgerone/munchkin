@@ -397,7 +397,7 @@ export const TRESORS = _cartesTresors;
 {
   type: TYPE_CARTE.MONSTRE,
   deck: DECK_TYPE.DONJON,
-  name: "Dragon dr plutonium",
+  name: "Dragon de plutonium",
   tooltip: "Ne poursuit aucun personnage de niveau 5 ou inférieur",
   level: 20,
   levelGain: 2,
